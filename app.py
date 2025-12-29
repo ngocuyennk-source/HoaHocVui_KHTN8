@@ -114,27 +114,27 @@ def get_hint(level, inputs):
         # Level 0: Na + O2 -> Na2O (a, b, c)
         if level == 0:
             a, b, c = inputs
-            if a != 2*c: msg += f"⚠️ Natri: Trái có {a}, Phải có {2*c}. Chưa bằng! "
-            if 2*b != c: msg += f"⚠️ Oxi: Trái có {2*b}, Phải có {c}. Oxi đi đâu rồi? "
+            if a != 2*c: msg += f"⚠️ Sodium: Trái có {a}, Phải có {2*c}. Chưa bằng! "
+            if 2*b != c: msg += f"⚠️ Oxygen: Trái có {2*b}, Phải có {c}. OxygenOxygen đi đâu rồi? "
         
         # Level 1: Fe + HCl -> FeCl2 + H2 (a, b, c, d)
         elif level == 1:
             a, b, c, d = inputs
             if a != c: msg += f"⚠️ Sắt (Fe) chưa cân bằng. "
-            if b != 2*c: msg += f"⚠️ Clo (Cl): Trái {b}, Phải {2*c}. "
-            if b != 2*d: msg += f"⚠️ Hiđro (H) đang lệch. "
+            if b != 2*c: msg += f"⚠️ Chlorine (Cl): Trái {b}, Phải {2*c}. "
+            if b != 2*d: msg += f"⚠️ Hidrogen (H) đang lệch. "
 
         # Level 2: Al + O2 -> Al2O3 (a, b, c)
         elif level == 2:
             a, b, c = inputs
-            if a != 2*c: msg += f"⚠️ Nhôm (Al) lệch rồi. "
-            if 2*b != 3*c: msg += f"⚠️ Oxi: Trái {2*b}, Phải {3*c}. Tìm Bội chung nhỏ nhất xem? "
+            if a != 2*c: msg += f"⚠️ Nhôm (Aluminium) lệch rồi. "
+            if 2*b != 3*c: msg += f"⚠️ Oxygen: Trái {2*b}, Phải {3*c}. Tìm Bội chung nhỏ nhất xem? "
 
         # Level 3: Mg + HCl -> MgCl2 + H2 (a, b, c, d)
         elif level == 3:
             a, b, c, d = inputs
-            if a != c: msg += "⚠️ Magie (Mg) chưa bằng. "
-            if b != 2*c: msg += "⚠️ Clo (Cl) đang lệch cán cân. "
+            if a != c: msg += "⚠️ Magnesium (Mg) chưa bằng. "
+            if b != 2*c: msg += "⚠️ Chlorine (Cl) đang lệch cán cân. "
             
         # Level 4: P + O2 -> P2O5 (a, b, c)
         elif level == 4:
