@@ -208,3 +208,229 @@ if chon_che_do == "Luyện Tập (1 Người)":
     che_do_luyen_tap()
 else:
     che_do_doi_khang()
+    import streamlit as st
+import time
+
+# --- CẤU HÌNH TRANG ---
+st.set_page_config(
+    page_title="Magic Lab - Disney Edition",
+    page_icon="🔮",
+    layout="wide"
+)
+
+# ==============================================================================
+# PHẦN CSS TRANG TRÍ (DISNEY STYLE)
+# ==============================================================================
+st.markdown("""
+<style>
+    /* 1. Nhúng Font chữ ma quái từ Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Jolly+Lodger&family=Creepster&display=swap');
+
+    /* 2. Hình nền: Tím ma thuật kết hợp sương mù */
+    .stApp {
+        background: radial-gradient(circle at center, #2b1055 0%, #000000 100%);
+        background-size: cover;
+        background-attachment: fixed;
+    }
+
+    /* 3. Tiêu đề lớn */
+    h1 {
+        font-family: 'Creepster', cursive;
+        color: #00ff9d; /* Xanh neon */
+        text-shadow: 4px 4px 0px #4b0082;
+        text-align: center;
+        font-size: 4rem !important;
+        margin-bottom: 0px;
+    }
+
+    h2 {
+        font-family: 'Jolly Lodger', cursive;
+        color: #ffcc00;
+        text-shadow: 2px 2px 0px #000;
+        font-size: 3rem !important;
+    }
+
+    h3 {
+        font-family: 'Jolly Lodger', cursive;
+        color: white;
+        font-size: 2rem !important;
+    }
+
+    /* 4. Thẻ chứa (Card) của mỗi đội - Hiệu ứng thủy tinh mờ */
+    .team-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 20px;
+        margin-top: 10px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Hiệu ứng phát sáng riêng cho từng đội */
+    .glow-ice { box-shadow: 0 0 30px #00ffff; border: 2px solid #00ffff; }
+    .glow-fire { box-shadow: 0 0 30px #ff4500; border: 2px solid #ff4500; }
+
+    /* 5. Tùy chỉnh nút bấm (Button) */
+    .stButton > button {
+        font-family: 'Jolly Lodger', cursive;
+        font-size: 1.5rem;
+        background: linear-gradient(180deg, #6a11cb 0%, #2575fc 100%);
+        color: white;
+        border: 2px solid #fff;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        transition: transform 0.2s;
+    }
+    .stButton > button:hover {
+        transform: scale(1.05);
+        color: #ffcc00;
+    }
+
+    /* 6. Tùy chỉnh ô nhập liệu */
+    .stNumberInput input {
+        background-color: rgba(0, 0, 0, 0.5);
+        color: #00ff9d;
+        font-weight: bold;
+        border: 1px solid #00ff9d;
+        border-radius: 10px;
+        text-align: center;
+    }
+    
+    /* 7. Thanh tiến trình */
+    .stProgress > div > div > div > div {
+        background-image: linear-gradient(to right, #00ff9d, #00b8ff);
+    }
+    
+    /* Ẩn các label nhỏ */
+    div[data-testid="stNumberInput"] label {
+        display: none;
+    }
+
+</style>
+""", unsafe_allow_html=True)
+
+# ==============================================================================
+# LOGIC GAME (GIỮ NGUYÊN)
+# ==============================================================================
+def che_do_doi_khang():
+    # Tiêu đề với Icon trang trí
+    st.markdown("<h1>⚡ MAGIC LAB DUEL ⚡</h1>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; color: #ccc;'>Đại Chiến Phòng Thí Nghiệm Ma Thuật</h3>", unsafe_allow_html=True)
+    
+    # Nút Reset (Canh giữa)
+    col_reset_1, col_reset_2, col_reset_3 = st.columns([1, 2, 1])
+    with col_reset_2:
+        if st.button("🔄 CHẾ TẠO LẠI TỪ ĐẦU", use_container_width=True):
+            st.session_state.p1_index = 0
+            st.session_state.p2_index = 0
+            st.rerun()
+
+    st.write("") # Khoảng cách
+
+    # KHỞI TẠO TRẠNG THÁI
+    if 'p1_index' not in st.session_state: st.session_state.p1_index = 0
+    if 'p2_index' not in st.session_state: st.session_state.p2_index = 0
+
+    # DỮ LIỆU CÂU HỎI
+    equations = [
+        ("CẤP 1: THUỐC NỔ NHẸ", "Na + O_2 \longrightarrow Na_2O", [4, 1, 2]),
+        ("CẤP 2: AXIT RỒNG", "Fe + HCl \longrightarrow FeCl_2 + H_2", [1, 2, 1, 1]),
+        ("CẤP 3: GIÁP KIM LOẠI", "Al + O_2 \longrightarrow Al_2O_3", [4, 3, 2]),
+        ("CẤP 4: THUỐC TĂNG LỰC", "Mg + HCl \longrightarrow MgCl_2 + H_2", [1, 2, 1, 1]),
+        ("CẤP 5: BOM KHÓI", "P + O_2 \longrightarrow P_2O_5", [4, 5, 2])
+    ]
+
+    # CHIA CỘT GIAO DIỆN
+    col1, col_mid, col2 = st.columns([1, 0.1, 1])
+
+    # --- ĐỘI 1 (PHE BĂNG) ---
+    with col1:
+        # Sử dụng HTML để tạo khung bao quanh (Team Card)
+        st.markdown("""
+        <div class='team-card glow-ice'>
+            <h2 style='text-align: center; color: #00ffff;'>❄️ TEAM ICE</h2>
+            <div style='text-align: center; font-size: 50px;'>🧊</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.write("") # Spacer
+
+        if st.session_state.p1_index < len(equations):
+            current_q_p1 = equations[st.session_state.p1_index]
+            
+            # Thanh tiến trình ma thuật
+            st.progress(st.session_state.p1_index / len(equations), text=f"Mana: {st.session_state.p1_index}/5")
+            
+            # Hiển thị câu hỏi trong khung chat
+            with st.container(border=True):
+                st.markdown(f"**🔮 {current_q_p1[0]}**")
+                st.latex(current_q_p1[1])
+            
+            with st.form(key=f"form_p1_{st.session_state.p1_index}"):
+                cols = st.columns(len(current_q_p1[2]))
+                inputs_p1 = []
+                for idx, c in enumerate(cols):
+                    val = c.number_input("HS", min_value=1, value=1, key=f"p1_{st.session_state.p1_index}_{idx}")
+                    inputs_p1.append(val)
+                
+                # Nút nộp bài
+                submit_p1 = st.form_submit_button("🧪 PHA CHẾ NGAY")
+            
+            if submit_p1:
+                if inputs_p1 == current_q_p1[2]:
+                    st.success("✨ PHÉP THUẬT THÀNH CÔNG! ✨")
+                    time.sleep(0.5)
+                    st.session_state.p1_index += 1
+                    st.rerun()
+                else:
+                    st.error("💥 BÙM! SAI CÔNG THỨC RỒI!")
+        else:
+            st.markdown("<div class='team-card glow-ice'><h1 style='color: #00ffff'>WINNER!</h1></div>", unsafe_allow_html=True)
+            st.balloons()
+            st.image("https://media.giphy.com/media/TdfyKrN7HGTIY/giphy.gif", caption="Chiến thắng huy hoàng!")
+
+    # --- CỘT GIỮA (VS) ---
+    with col_mid:
+        st.markdown("<br><br><br><br><h1 style='color: white; font-size: 50px;'>VS</h1>", unsafe_allow_html=True)
+
+    # --- ĐỘI 2 (PHE LỬA) ---
+    with col2:
+        st.markdown("""
+        <div class='team-card glow-fire'>
+            <h2 style='text-align: center; color: #ff4500;'>🔥 TEAM FIRE</h2>
+            <div style='text-align: center; font-size: 50px;'>🐉</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.write("")
+
+        if st.session_state.p2_index < len(equations):
+            current_q_p2 = equations[st.session_state.p2_index]
+            
+            st.progress(st.session_state.p2_index / len(equations), text=f"Mana: {st.session_state.p2_index}/5")
+            
+            with st.container(border=True):
+                st.markdown(f"**🔮 {current_q_p2[0]}**")
+                st.latex(current_q_p2[1])
+            
+            with st.form(key=f"form_p2_{st.session_state.p2_index}"):
+                cols = st.columns(len(current_q_p2[2]))
+                inputs_p2 = []
+                for idx, c in enumerate(cols):
+                    val = c.number_input("HS", min_value=1, value=1, key=f"p2_{st.session_state.p2_index}_{idx}")
+                    inputs_p2.append(val)
+                
+                submit_p2 = st.form_submit_button("🧪 PHA CHẾ NGAY")
+            
+            if submit_p2:
+                if inputs_p2 == current_q_p2[2]:
+                    st.success("✨ PHÉP THUẬT THÀNH CÔNG! ✨")
+                    time.sleep(0.5)
+                    st.session_state.p2_index += 1
+                    st.rerun()
+                else:
+                    st.error("💥 BÙM! SAI CÔNG THỨC RỒI!")
+        else:
+            st.markdown("<div class='team-card glow-fire'><h1 style='color: #ff4500'>WINNER!</h1></div>", unsafe_allow_html=True)
+            st.snow() # Lửa biến thành tro tàn (hiệu ứng tuyết
