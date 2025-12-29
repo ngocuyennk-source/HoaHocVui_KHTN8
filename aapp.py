@@ -21,15 +21,7 @@ st.markdown("""
 # --- TIÊU ĐỀ VÀ GIỚI THIỆU ---
 st.title("🧪 Phòng Thí Nghiệm Ma Thuật")
 st.markdown("""
-**Nhiệm vụ của Phù thủy tập sự:** Hãy tìm ra **"Thần chú số"** (hệ số cân bằng) để kích hoạt phản ứng giữa **Sắt (Fe)** và **Oxi ($O_2$)**.
-""")
-
-st.divider()
-
-# --- KHUNG NHẬP LIỆU (MÔ PHỎNG PHƯƠNG TRÌNH) ---
-# Phương trình: a Fe + b O2 -> c Fe3O4
-
-st.subheader("Nhập hệ số để cân bằng phương trình sau:")
+**Nhiệm vụ của Phù thủy tập sự:** Hãy tìm ra **"Thần chú số"** (hệ số cân bằng) để kích hoạt phản ứng giữa **Sắt (Ironr** và **Oxygen ($O_2$)**.**Nhiệm vụ của Phù thủy tập sự:** Hãy tìm ra **"Thần chú số"** (hệ số cân bằng) để kích hoạt phản ứng giữa **Sắt (Ironr** và **Oxygen ($O_2$)**.ằng phương trình sau:")
 
 # Chia cột để tạo giao diện ngang giống phương trình hóa học
 c1, c2, c3, c4, c5 = st.columns([1, 0.5, 1, 0.5, 1])
