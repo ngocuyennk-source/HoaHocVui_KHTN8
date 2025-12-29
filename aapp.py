@@ -78,7 +78,7 @@ if st.button("🔥 KÍCH HOẠT PHẢN ỨNG 🔥"):
         # Bạn có thể thay link youtube này bằng link khác hoặc video trong máy
         st.video("https://www.youtube.com/watch?v=5MDH92VxPEQ") 
         
-        st.info("💡 **Ứng dụng thực tế:** Phản ứng này toả nhiệt rất mạnh, các tia lửa bắn ra chính là các hạt Oxit sắt từ nóng đỏ. Nó là cơ sở để tạo ra pháo hoa đơn giản!")
+        st.info("💡 **Ứng dụng thực tế:** Phản ứng này toả nhiệt rất mạnh, các tia lửa bắn ra chính là các hạt Oxide sắt từ nóng đỏ. Nó là cơ sở để tạo ra pháo hoa đơn giản!")
         
     else:
         # --- TRƯỜNG HỢP SAI (ERROR) ---
@@ -89,8 +89,7 @@ if st.button("🔥 KÍCH HOẠT PHẢN ỨNG 🔥"):
         if Fe_trai != Fe_phai:
             error_msg += f"- **Nguyên tố Sắt (Fe):** Bên trái có {Fe_trai}, nhưng bên phải có {Fe_phai}. Vẫn chưa cân bằng!\n"
         if O_trai != O_phai:
-            error_msg += f"- **Nguyên tố Oxi (O):** Bên trái có {O_trai}, nhưng bên phải có {O_phai}. Oxi đã bay đi đâu rồi?\n"
-            
+            error_msg += f"- **Nguyên tố Oxygen (O):** Bên trái có {O_trai}, nhưng bên phải có {O_phai}. OxygenOxygen đã bay đi đâu rồi?\n"             
         st.warning(error_msg)
         st.write("👉 Hãy thử điều chỉnh lại các con số và kích hoạt lại nhé!")
 
