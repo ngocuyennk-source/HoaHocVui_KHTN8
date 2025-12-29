@@ -89,7 +89,7 @@ if st.button("🔥 KÍCH HOẠT PHẢN ỨNG 🔥"):
         if Fe_trai != Fe_phai:
             error_msg += f"- **Nguyên tố Sắt (Fe):** Bên trái có {Fe_trai}, nhưng bên phải có {Fe_phai}. Vẫn chưa cân bằng!\n"
         if O_trai != O_phai:
-            error_msg += f"- **Nguyên tố Oxygen (O):** Bên trái có {O_trai}, nhưng bên phải có {O_phai}. OxygenOxygen đã bay đi đâu rồi?\n"             
+            error_msg += f"- **Nguyên tố Oxygen (O):** Bên trái có {O_trai}, nhưng bên phải có {O_phai}. Oxygen đã bay đi đâu rồi?\n"             
         st.warning(error_msg)
         st.write("👉 Hãy thử điều chỉnh lại các con số và kích hoạt lại nhé!")
 
