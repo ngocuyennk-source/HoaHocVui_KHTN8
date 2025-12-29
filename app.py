@@ -71,11 +71,15 @@ def che_do_luyen_tap():
 
 # ==============================================================================
 # # ==============================================================================
-# CHỨC NĂNG 2: CHẾ ĐỘ ĐỐI KHÁNG (CẬP NHẬT: TỪNG CÂU MỘT)
+import streamlit as st
+import time
+
+# ==============================================================================
+# CHỨC NĂNG 2: CHẾ ĐỘ ĐỐI KHÁNG (CẬP NHẬT: TRẢ LỜI ĐÚNG MỚI QUA CÂU)
 # ==============================================================================
 def che_do_doi_khang():
     st.header("⚔️ ĐẠI CHIẾN PHÙ THỦY (LUẬT MỚI: TỪNG CÂU)")
-    st.markdown("Luật chơi: Trả lời đúng mới được qua câu tiếp theo. Ai về đích trước sẽ thắng!")
+    st.markdown("Luật chơi: **Giải quyết xong câu hiện tại mới được mở khóa câu tiếp theo.** Đội nào về đích trước sẽ thắng!")
     
     # Nút Reset game để chơi lại từ đầu
     if st.button("🔄 Bắt đầu trận đấu mới"):
@@ -85,13 +89,14 @@ def che_do_doi_khang():
 
     st.divider()
 
-    # KHỞI TẠO TRẠNG THÁI (SESSION STATE) NẾU CHƯA CÓ
+    # 1. KHỞI TẠO TRẠNG THÁI (SESSION STATE) NẾU CHƯA CÓ
+    # Biến này giúp nhớ xem mỗi đội đang ở câu số mấy (0, 1, 2...)
     if 'p1_index' not in st.session_state:
         st.session_state.p1_index = 0
     if 'p2_index' not in st.session_state:
         st.session_state.p2_index = 0
 
-    # Dữ liệu 5 phương trình (Câu hỏi, Phương trình hiển thị, Đáp án)
+    # 2. DỮ LIỆU CÂU HỎI (Câu hỏi, Phương trình hiển thị, Đáp án đúng)
     equations = [
         ("Câu 1: Khởi động", "Na + O_2 \longrightarrow Na_2O", [4, 1, 2]),
         ("Câu 2: Axit cơ bản", "Fe + HCl \longrightarrow FeCl_2 + H_2", [1, 2, 1, 1]),
@@ -102,52 +107,59 @@ def che_do_doi_khang():
 
     col1, col_mid, col2 = st.columns([1, 0.1, 1])
 
-    # --- NGƯỜI CHƠI 1 (BÊN TRÁI) ---
+    # --- ĐỘI 1 (PHE BĂNG - TRÁI) ---
     with col1:
         st.subheader("❄️ ĐỘI BĂNG")
         
-        # Kiểm tra xem đã hoàn thành hết câu hỏi chưa
+        # Kiểm tra: Nếu chưa hết câu hỏi thì hiện câu tiếp theo
         if st.session_state.p1_index < len(equations):
+            # Lấy dữ liệu câu hỏi hiện tại dựa trên chỉ số index
             current_q_p1 = equations[st.session_state.p1_index]
             
             # Hiển thị thanh tiến trình
             st.progress(st.session_state.p1_index / len(equations), text=f"Tiến độ: {st.session_state.p1_index}/5")
             
             st.info(f"**{current_q_p1[0]}**")
-            st.latex(current_q_p1[1]) # Dùng latex để viết phương trình đẹp hơn
+            st.latex(current_q_p1[1]) # Hiển thị phương trình đẹp
             
-            # Tạo Form để gom nhóm nhập liệu
+            # TẠO FORM NHẬP LIỆU (Để không bị tải lại trang khi nhập số)
+            # Quan trọng: key của form phải là duy nhất theo từng câu hỏi
             with st.form(key=f"form_p1_{st.session_state.p1_index}"):
                 cols = st.columns(len(current_q_p1[2]))
                 inputs_p1 = []
                 for idx, c in enumerate(cols):
-                    val = c.number_input(f"HeSo_{idx}", min_value=1, value=1, label_visibility="collapsed")
+                    # Key của input cũng phải duy nhất
+                    val = c.number_input(f"HS", min_value=1, value=1, label_visibility="collapsed", key=f"p1_input_{st.session_state.p1_index}_{idx}")
                     inputs_p1.append(val)
                 
+                # Nút nộp bài nằm trong form
                 submit_p1 = st.form_submit_button("❄️ Nộp bài & Qua câu")
             
+            # XỬ LÝ KHI BẤM NÚT NỘP
             if submit_p1:
                 if inputs_p1 == current_q_p1[2]:
-                    st.success("Chính xác! Đang chuyển câu...")
-                    st.session_state.p1_index += 1 # Tăng thứ tự câu hỏi
-                    time.sleep(0.5) # Dừng 1 chút để HS thấy thông báo đúng
-                    st.rerun() # Tải lại trang ngay lập tức
+                    st.success("Chính xác! Đang mở khóa câu tiếp theo...")
+                    time.sleep(0.5) # Dừng 1 xíu cho HS nhìn thấy chữ Chính xác
+                    st.session_state.p1_index += 1 # Tăng cấp độ lên 1
+                    st.rerun() # Tải lại trang để hiện câu mới
                 else:
-                    st.error("Chưa đúng! Hãy kiểm tra lại.")
+                    st.error("Chưa đúng! Hãy kiểm tra lại hệ số.")
         else:
-            # Khi đã xong hết 5 câu
+            # Khi đã xong hết 5 câu (Về đích)
             st.balloons()
             st.success("🏆 ĐỘI BĂNG ĐÃ VỀ ĐÍCH!")
-            st.markdown("### 🥇 WINNER")
+            st.image("https://media.giphy.com/media/26tOZ42Mg6pbTUPHW/giphy.gif") # Ảnh động cúp vàng (ví dụ)
 
     # --- ĐƯỜNG KẺ GIỮA ---
     with col_mid:
-        st.markdown("<div style='height: 500px; border-left: 2px solid #e6e6e6; margin-left: 50%;'></div>", unsafe_allow_html=True)
+        # Kẻ một đường dọc để phân chia
+        st.markdown("<div style='height: 400px; border-left: 2px solid #e6e6e6; margin-left: 50%;'></div>", unsafe_allow_html=True)
 
-    # --- NGƯỜI CHƠI 2 (BÊN PHẢI) ---
+    # --- ĐỘI 2 (PHE LỬA - PHẢI) ---
     with col2:
         st.subheader("🔥 ĐỘI LỬA")
         
+        # Logic tương tự Đội 1 nhưng dùng biến p2_index
         if st.session_state.p2_index < len(equations):
             current_q_p2 = equations[st.session_state.p2_index]
             
@@ -160,23 +172,23 @@ def che_do_doi_khang():
                 cols = st.columns(len(current_q_p2[2]))
                 inputs_p2 = []
                 for idx, c in enumerate(cols):
-                    val = c.number_input(f"HeSo_{idx}", min_value=1, value=1, label_visibility="collapsed")
+                    val = c.number_input(f"HS", min_value=1, value=1, label_visibility="collapsed", key=f"p2_input_{st.session_state.p2_index}_{idx}")
                     inputs_p2.append(val)
                 
                 submit_p2 = st.form_submit_button("🔥 Nộp bài & Qua câu")
             
             if submit_p2:
                 if inputs_p2 == current_q_p2[2]:
-                    st.success("Chính xác! Đang chuyển câu...")
-                    st.session_state.p2_index += 1
+                    st.success("Chính xác! Đang mở khóa câu tiếp theo...")
                     time.sleep(0.5)
+                    st.session_state.p2_index += 1
                     st.rerun()
                 else:
-                    st.error("Chưa đúng! Hãy kiểm tra lại.")
+                    st.error("Chưa đúng! Hãy kiểm tra lại hệ số.")
         else:
-            st.snow() # Hoặc hiệu ứng khác
+            st.snow()
             st.success("🏆 ĐỘI LỬA ĐÃ VỀ ĐÍCH!")
-            st.markdown("### 🥇 WINNER")
+            st.image("https://media.giphy.com/media/l0HlHJGHe3yAMhdQY/giphy.gif")
 # ==============================================================================
 # MENU ĐIỀU HƯỚNG CHÍNH (SIDEBAR)
 # ==============================================================================
