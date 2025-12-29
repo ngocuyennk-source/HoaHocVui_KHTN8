@@ -70,66 +70,113 @@ def che_do_luyen_tap():
         st.warning("Tính năng đang cập nhật thêm bài tập...")
 
 # ==============================================================================
-# CHỨC NĂNG 2: CHẾ ĐỘ ĐỐI KHÁNG (WIZARD DUEL)
+# # ==============================================================================
+# CHỨC NĂNG 2: CHẾ ĐỘ ĐỐI KHÁNG (CẬP NHẬT: TỪNG CÂU MỘT)
 # ==============================================================================
 def che_do_doi_khang():
-    st.header("⚔️ ĐẠI CHIẾN PHÙ THỦY (2 NGƯỜI CHƠI)")
-    st.markdown("Luật chơi: Hai bên cùng giải 5 phương trình. Bên nào xong trước và đúng hết sẽ thắng!")
+    st.header("⚔️ ĐẠI CHIẾN PHÙ THỦY (LUẬT MỚI: TỪNG CÂU)")
+    st.markdown("Luật chơi: Trả lời đúng mới được qua câu tiếp theo. Ai về đích trước sẽ thắng!")
+    
+    # Nút Reset game để chơi lại từ đầu
+    if st.button("🔄 Bắt đầu trận đấu mới"):
+        st.session_state.p1_index = 0
+        st.session_state.p2_index = 0
+        st.rerun()
+
     st.divider()
 
-    # Dữ liệu 5 phương trình
+    # KHỞI TẠO TRẠNG THÁI (SESSION STATE) NẾU CHƯA CÓ
+    if 'p1_index' not in st.session_state:
+        st.session_state.p1_index = 0
+    if 'p2_index' not in st.session_state:
+        st.session_state.p2_index = 0
+
+    # Dữ liệu 5 phương trình (Câu hỏi, Phương trình hiển thị, Đáp án)
     equations = [
-        ("Na + O2", "Na2O", [4, 1, 2]),
-        ("Fe + HCl", "FeCl2 + H2", [1, 2, 1, 1]),
-        ("Al + O2", "Al2O3", [4, 3, 2]),
-        ("Mg + HCl", "MgCl2 + H2", [1, 2, 1, 1]),
-        ("P + O2", "P2O5", [4, 5, 2])
+        ("Câu 1: Khởi động", "Na + O_2 \longrightarrow Na_2O", [4, 1, 2]),
+        ("Câu 2: Axit cơ bản", "Fe + HCl \longrightarrow FeCl_2 + H_2", [1, 2, 1, 1]),
+        ("Câu 3: Kim loại cháy", "Al + O_2 \longrightarrow Al_2O_3", [4, 3, 2]),
+        ("Câu 4: Tăng tốc", "Mg + HCl \longrightarrow MgCl_2 + H_2", [1, 2, 1, 1]),
+        ("Câu 5: Về đích", "P + O_2 \longrightarrow P_2O_5", [4, 5, 2])
     ]
 
-    col1, col_mid, col2 = st.columns([1, 0.05, 1])
+    col1, col_mid, col2 = st.columns([1, 0.1, 1])
 
-    # --- NGƯỜI CHƠI 1 ---
+    # --- NGƯỜI CHƠI 1 (BÊN TRÁI) ---
     with col1:
-        st.subheader("❄️ ĐỘI BĂNG (Player 1)")
-        p1_inputs = []
-        for i, eq in enumerate(equations):
-            st.write(f"**Câu {i+1}:** {eq[0]} ➝ {eq[1]}")
-            cols = st.columns(len(eq[2]))
-            row = [c.number_input(f"p1_c{i}_{j}", 1, 10, 1, key=f"p1_{i}_{j}", label_visibility="collapsed") for j, c in enumerate(cols)]
-            p1_inputs.append(row)
-            st.write("---")
+        st.subheader("❄️ ĐỘI BĂNG")
         
-        if st.button("❄️ ĐỘI BĂNG NỘP BÀI", type="primary", use_container_width=True):
-            score = sum([1 for i, ans in enumerate(p1_inputs) if ans == equations[i][2]])
-            if score == 5:
-                st.balloons()
-                st.success("🏆 ĐỘI BĂNG CHIẾN THẮNG TUYỆT ĐỐI!")
-            else:
-                st.error(f"Sai rồi! Bạn mới đúng {score}/5 câu.")
+        # Kiểm tra xem đã hoàn thành hết câu hỏi chưa
+        if st.session_state.p1_index < len(equations):
+            current_q_p1 = equations[st.session_state.p1_index]
+            
+            # Hiển thị thanh tiến trình
+            st.progress(st.session_state.p1_index / len(equations), text=f"Tiến độ: {st.session_state.p1_index}/5")
+            
+            st.info(f"**{current_q_p1[0]}**")
+            st.latex(current_q_p1[1]) # Dùng latex để viết phương trình đẹp hơn
+            
+            # Tạo Form để gom nhóm nhập liệu
+            with st.form(key=f"form_p1_{st.session_state.p1_index}"):
+                cols = st.columns(len(current_q_p1[2]))
+                inputs_p1 = []
+                for idx, c in enumerate(cols):
+                    val = c.number_input(f"HeSo_{idx}", min_value=1, value=1, label_visibility="collapsed")
+                    inputs_p1.append(val)
+                
+                submit_p1 = st.form_submit_button("❄️ Nộp bài & Qua câu")
+            
+            if submit_p1:
+                if inputs_p1 == current_q_p1[2]:
+                    st.success("Chính xác! Đang chuyển câu...")
+                    st.session_state.p1_index += 1 # Tăng thứ tự câu hỏi
+                    time.sleep(0.5) # Dừng 1 chút để HS thấy thông báo đúng
+                    st.rerun() # Tải lại trang ngay lập tức
+                else:
+                    st.error("Chưa đúng! Hãy kiểm tra lại.")
+        else:
+            # Khi đã xong hết 5 câu
+            st.balloons()
+            st.success("🏆 ĐỘI BĂNG ĐÃ VỀ ĐÍCH!")
+            st.markdown("### 🥇 WINNER")
 
     # --- ĐƯỜNG KẺ GIỮA ---
     with col_mid:
-        st.markdown("<div style='height: 100%; border-left: 2px solid grey;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 500px; border-left: 2px solid #e6e6e6; margin-left: 50%;'></div>", unsafe_allow_html=True)
 
-    # --- NGƯỜI CHƠI 2 ---
+    # --- NGƯỜI CHƠI 2 (BÊN PHẢI) ---
     with col2:
-        st.subheader("🔥 ĐỘI LỬA (Player 2)")
-        p2_inputs = []
-        for i, eq in enumerate(equations):
-            st.write(f"**Câu {i+1}:** {eq[0]} ➝ {eq[1]}")
-            cols = st.columns(len(eq[2]))
-            row = [c.number_input(f"p2_c{i}_{j}", 1, 10, 1, key=f"p2_{i}_{j}", label_visibility="collapsed") for j, c in enumerate(cols)]
-            p2_inputs.append(row)
-            st.write("---")
-
-        if st.button("🔥 ĐỘI LỬA NỘP BÀI", type="primary", use_container_width=True):
-            score = sum([1 for i, ans in enumerate(p2_inputs) if ans == equations[i][2]])
-            if score == 5:
-                st.snow()
-                st.success("🏆 ĐỘI LỬA CHIẾN THẮNG TUYỆT ĐỐI!")
-            else:
-                st.error(f"Sai rồi! Bạn mới đúng {score}/5 câu.")
-
+        st.subheader("🔥 ĐỘI LỬA")
+        
+        if st.session_state.p2_index < len(equations):
+            current_q_p2 = equations[st.session_state.p2_index]
+            
+            st.progress(st.session_state.p2_index / len(equations), text=f"Tiến độ: {st.session_state.p2_index}/5")
+            
+            st.warning(f"**{current_q_p2[0]}**")
+            st.latex(current_q_p2[1])
+            
+            with st.form(key=f"form_p2_{st.session_state.p2_index}"):
+                cols = st.columns(len(current_q_p2[2]))
+                inputs_p2 = []
+                for idx, c in enumerate(cols):
+                    val = c.number_input(f"HeSo_{idx}", min_value=1, value=1, label_visibility="collapsed")
+                    inputs_p2.append(val)
+                
+                submit_p2 = st.form_submit_button("🔥 Nộp bài & Qua câu")
+            
+            if submit_p2:
+                if inputs_p2 == current_q_p2[2]:
+                    st.success("Chính xác! Đang chuyển câu...")
+                    st.session_state.p2_index += 1
+                    time.sleep(0.5)
+                    st.rerun()
+                else:
+                    st.error("Chưa đúng! Hãy kiểm tra lại.")
+        else:
+            st.snow() # Hoặc hiệu ứng khác
+            st.success("🏆 ĐỘI LỬA ĐÃ VỀ ĐÍCH!")
+            st.markdown("### 🥇 WINNER")
 # ==============================================================================
 # MENU ĐIỀU HƯỚNG CHÍNH (SIDEBAR)
 # ==============================================================================
