@@ -1,107 +1,86 @@
 import streamlit as st
-import time
 
-# --- CẤU HÌNH TRANG ---
-st.set_page_config(
-    page_title="Magic Chemical Lab",
-    page_icon="🧪",
-    layout="centered"
-)
+st.set_page_config(layout="wide", page_title="Đại Chiến Phù Thủy") # Chỉnh layout rộng để chia đôi đẹp hơn
 
-# --- CSS TÙY CHỈNH (Để giao diện đẹp hơn) ---
-st.markdown("""
-<style>
-    .big-font { font-size:20px !important; font-weight: bold; }
-    .stButton>button { width: 100%; background-color: #ff4b4b; color: white; }
-    .success-text { color: green; font-weight: bold; font-size: 24px; }
-    .error-text { color: red; font-weight: bold; }
-</style>
-""", unsafe_allow_html=True)
-
-# --- TIÊU ĐỀ VÀ GIỚI THIỆU ---
-st.title("🧪 Phòng Thí Nghiệm Ma Thuật")
-st.markdown("""
-**Nhiệm vụ của Phù thủy tập sự:** Hãy tìm ra **"Thần chú số"** (hệ số cân bằng) để kích hoạt phản ứng giữa **Sắt (Fe)** và **Oxi ($O_2$)**.
-""")
-
-st.divider()
-
-# --- KHUNG NHẬP LIỆU (MÔ PHỎNG PHƯƠNG TRÌNH) ---
-# Phương trình: a Fe + b O2 -> c Fe3O4
-
-st.subheader("Nhập hệ số để cân bằng phương trình sau:")
-
-# Chia cột để tạo giao diện ngang giống phương trình hóa học
-c1, c2, c3, c4, c5 = st.columns([1, 0.5, 1, 0.5, 1])
-
-with c1:
-    st.markdown("### Fe")
-    # min_value=1 vì hệ số không thể bằng 0
-    he_so_Fe = st.number_input("Hệ số Fe", min_value=1, value=1, label_visibility="collapsed")
-
-with c2:
-    st.markdown("## +")
-
-with c3:
-    st.markdown("### $O_2$")
-    he_so_O2 = st.number_input("Hệ số O2", min_value=1, value=1, label_visibility="collapsed")
-
-with c4:
-    st.markdown("## ➝")
-
-with c5:
-    st.markdown("### $Fe_3O_4$")
-    he_so_Fe3O4 = st.number_input("Hệ số Fe3O4", min_value=1, value=1, label_visibility="collapsed")
-
-st.write("") # Khoảng cách
-
-# --- XỬ LÝ LOGIC (NÚT BẤM) ---
-if st.button("🔥 KÍCH HOẠT PHẢN ỨNG 🔥"):
-    
-    # 1. Tính toán số nguyên tử 2 vế
-    # Vế trái (Tham gia)
-    Fe_trai = he_so_Fe * 1
-    O_trai = he_so_O2 * 2
-    
-    # Vế phải (Sản phẩm)
-    Fe_phai = he_so_Fe3O4 * 3
-    O_phai = he_so_Fe3O4 * 4
-    
-    # Tạo thanh tiến trình (Progress bar) cho hồi hộp
-    progress_text = "Đang nạp năng lượng..."
-    my_bar = st.progress(0, text=progress_text)
-    for percent_complete in range(100):
-        time.sleep(0.01)
-        my_bar.progress(percent_complete + 1, text=progress_text)
-    time.sleep(0.5)
-    my_bar.empty() # Xóa thanh tiến trình
-
-    # 2. Kiểm tra điều kiện cân bằng
-    if (Fe_trai == Fe_phai) and (O_trai == O_phai):
-        # --- TRƯỜNG HỢP ĐÚNG (SUCCESS) ---
-        st.balloons() # Hiệu ứng bóng bay chúc mừng
-        st.markdown('<p class="success-text">✨ CHÍNH XÁC! PHÉP THUẬT ĐÃ ĐƯỢC KÍCH HOẠT! ✨</p>', unsafe_allow_html=True)
-        
-        # HIỆN PHẦN THƯỞNG: VIDEO PHẢN ỨNG THỰC TẾ
-        # Bạn có thể thay link youtube này bằng link khác hoặc video trong máy
-        st.video("https://www.youtube.com/watch?v=5MDH92VxPEQ") 
-        
-        st.info("💡 **Ứng dụng thực tế:** Phản ứng này toả nhiệt rất mạnh, các tia lửa bắn ra chính là các hạt Oxit sắt từ nóng đỏ. Nó là cơ sở để tạo ra pháo hoa đơn giản!")
-        
-    else:
-        # --- TRƯỜNG HỢP SAI (ERROR) ---
-        st.error("💥 BÙM! Lò luyện thuốc đã nổ vì sai công thức!")
-        
-        # Báo lỗi thông minh (Chỉ ra cụ thể sai ở đâu)
-        error_msg = ""
-        if Fe_trai != Fe_phai:
-            error_msg += f"- **Nguyên tố Sắt (Fe):** Bên trái có {Fe_trai}, nhưng bên phải có {Fe_phai}. Vẫn chưa cân bằng!\n"
-        if O_trai != O_phai:
-            error_msg += f"- **Nguyên tố Oxi (O):** Bên trái có {O_trai}, nhưng bên phải có {O_phai}. Oxi đã bay đi đâu rồi?\n"
-            
-        st.warning(error_msg)
-        st.write("👉 Hãy thử điều chỉnh lại các con số và kích hoạt lại nhé!")
-
-# --- FOOTER ---
+st.title("⚔️ PHÙ THỦY TRANH TÀI (WIZARD DUEL) ⚔️")
 st.markdown("---")
-st.caption("Ứng dụng hỗ trợ học tập môn KHTN 8 - Sáng kiến kinh nghiệm của Giáo viên.")
+
+# Dữ liệu 5 phương trình mẫu (Giáo viên có thể thay đổi)
+# Cấu trúc: (Chất tham gia, Chất sản phẩm, Đáp án đúng [hệ số])
+equations = [
+    ("Na + O2", "Na2O", [4, 1, 2]),
+    ("Fe + HCl", "FeCl2 + H2", [1, 2, 1, 1]),
+    ("Al + O2", "Al2O3", [4, 3, 2]),
+    ("P + O2", "P2O5", [4, 5, 2]),
+    ("KClO3", "KCl + O2", [2, 2, 3])
+]
+
+# Chia 2 cột lớn cho 2 người chơi
+col1, col_mid, col2 = st.columns([1, 0.1, 1]) # col_mid để tạo khoảng cách ở giữa
+
+# --- NGƯỜI CHƠI 1 (PHE BĂNG - TRÁI) ---
+with col1:
+    st.header("❄️ PHE BĂNG (Player 1)")
+    st.info("Nhiệm vụ: Cân bằng 5 phương trình bên dưới!")
+    
+    p1_inputs = [] # Chứa các giá trị nhập của P1
+    
+    for i, eq in enumerate(equations):
+        st.markdown(f"**Câu {i+1}:** {eq[0]} ➝ {eq[1]}")
+        # Tạo các ô nhập liệu nhỏ ngang hàng
+        cols_input = st.columns(len(eq[2]))
+        row_inputs = []
+        for j, c in enumerate(cols_input):
+            val = c.number_input(f"HS_{i}_{j}_P1", min_value=1, value=1, label_visibility="collapsed", key=f"p1_{i}_{j}")
+            row_inputs.append(val)
+        p1_inputs.append(row_inputs)
+        st.write("---")
+
+    if st.button("❄️ PHE BĂNG HOÀN THÀNH", type="primary"):
+        # Kiểm tra đáp án P1
+        score_p1 = 0
+        for i, ans in enumerate(p1_inputs):
+            if ans == equations[i][2]:
+                score_p1 += 1
+        
+        if score_p1 == 5:
+            st.balloons()
+            st.success("🏆 TUYỆT VỜI! PHE BĂNG ĐÃ CHIẾN THẮNG!")
+            st.video("https://www.youtube.com/watch?v=video_bang_tuyet_dep") # Link video phần thưởng
+        else:
+            st.error(f"Chưa chính xác! Bạn mới đúng {score_p1}/5 câu. Cố lên!")
+
+# --- VẠCH NGĂN CÁCH ---
+with col_mid:
+    st.markdown("<h1 style='text-align: center; color: grey;'>VS</h1>", unsafe_allow_html=True)
+
+# --- NGƯỜI CHƠI 2 (PHE LỬA - PHẢI) ---
+with col2:
+    st.header("🔥 PHE LỬA (Player 2)")
+    st.warning("Nhiệm vụ: Cân bằng 5 phương trình bên dưới!")
+    
+    p2_inputs = [] # Chứa các giá trị nhập của P2
+    
+    for i, eq in enumerate(equations):
+        st.markdown(f"**Câu {i+1}:** {eq[0]} ➝ {eq[1]}")
+        cols_input = st.columns(len(eq[2]))
+        row_inputs = []
+        for j, c in enumerate(cols_input):
+            val = c.number_input(f"HS_{i}_{j}_P2", min_value=1, value=1, label_visibility="collapsed", key=f"p2_{i}_{j}")
+            row_inputs.append(val)
+        p2_inputs.append(row_inputs)
+        st.write("---")
+
+    if st.button("🔥 PHE LỬA HOÀN THÀNH", type="secondary"):
+        # Kiểm tra đáp án P2
+        score_p2 = 0
+        for i, ans in enumerate(p2_inputs):
+            if ans == equations[i][2]:
+                score_p2 += 1
+        
+        if score_p2 == 5:
+            st.snow() # Hiệu ứng khác cho đội đỏ (hoặc đổi thành pháo hoa nếu muốn)
+            st.success("🏆 XUẤT SẮC! PHE LỬA ĐÃ CHIẾN THẮNG!")
+            st.video("https://www.youtube.com/watch?v=video_lua_dep") # Link video phần thưởng
+        else:
+            st.error(f"Chưa chính xác! Bạn mới đúng {score_p2}/5 câu. Kiểm tra lại nhé!")
